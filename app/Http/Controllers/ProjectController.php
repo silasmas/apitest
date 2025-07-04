@@ -16,10 +16,11 @@ class ProjectController extends Controller
 
     public function index()
     {
-        $data=Projet::whereDate('date_debut', '>', now())
-            ->orWhereDate('date_fin', '>', "2025-12-31")
-            ->orWhere('rate', '>', 0)
-            ->get();
+        // $data=Projet::whereDate('date_debut', '>', now())
+        //     ->orWhereDate('date_fin', '>', "2025-12-31")
+        //     ->orWhere('rate', '>', 0)->orderBy("rate","DESC")
+        //     ->get();
+            $data=Projet::paginate(3);
         return $this->success("List of projects", $data);
 
     }
@@ -51,5 +52,15 @@ class ProjectController extends Controller
         // Code to delete a specific project
         return new JsonResponse([
             'message' => 'Project deleted',200]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $projects = Projet::where('nom', 'LIKE', "%{$query}%")
+            ->orWhere('description', 'LIKE', "%{$query}%")
+            ->get();
+
+        return $this->success("Search results for '{$query}'", $projects);
     }
 }
